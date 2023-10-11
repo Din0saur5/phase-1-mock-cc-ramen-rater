@@ -26,112 +26,52 @@ As a user, I can:
 //add functionality to create new ramen form.  can access each value using form.inputName. value
 // for advance: add fetch post request  
 //document.addEventListener(Dom)
+const menu = document.getElementById("ramen-menu");
+const form = document.getElementById("new-ramen");
 
-const form = document.getElementById("new-ramen")
-const menu = document.getElementById("ramen-menu")
-const editForm = document.getElementById("edit-ramen")
-
-const displayHeader = () => {
-    return fetch("http://localhost:3000/ramens")
-    .then((resp) => resp.json())
-    .then((data)=>{
-        
-        document.querySelector(".detail-image").src = data[0].image;
-        document.querySelector(".name").textContent = data[0].name;
-        document.querySelector(".restaurant").textContent = data[0].restaurant;
-        document.getElementById("rating-display").textContent = data[0].rating;
-        document.getElementById("comment-display").textContent = data[0].comment;
-        data.forEach((ramen)=> 
-        renderRamen(ramen));
-    })
-}
-
-const renderRamen = (ramen) =>{
-    console.log(ramen);
-    const ramenImg = document.createElement("img");
-   
-    ramenImg.src = ramen.image;
-    menu.appendChild(ramenImg)
-    const deleteBtn = document.createElement("button");
-    deleteBtn.id = "delete"
-    deleteBtn.innerText = "X"
-    menu.appendChild(deleteBtn)
-
-    
-    deleteBtn.addEventListener('click', (e)=>{
-        fetch(`http://localhost:3000/ramens/${ramen.id}`,{
-        method: 'DELETE',
-        
-    })
-    .then(resp => resp.json())
-    .then(()=>{ramenImg.remove(); deleteBtn.remove()})
-    })
-
-
-    ramenImg.addEventListener("click", (e)=>{
-        document.querySelector(".detail-image").src = ramen.image;
-        document.querySelector(".name").textContent = ramen.name;
-        document.querySelector(".restaurant").textContent = ramen.restaurant;
+   const displayHeader = () =>{
+            fetch('http://localhost:3000/ramens')
+            .then(resp => resp.json())
+            .then((data) => {
+                data.forEach((ramen)=>{
+                  return  renderRamen(ramen)}) // I need a function that puts the server data on the page
+fetch
+            })
+        }
+    const renderRamen = (ramen) => { // define that function here
+        const ramenImg = document.createElement("img");
+        ramenImg.src = ramen.image;
+        ramenImg.alt = "picture of ramen";
+        menu.appendChild(ramenImg);
+        ramenImg.addEventListener('click', (e)=>{
+        document.querySelector('img.detail-image').src = ramen.image;
+        document.querySelector('h2.name').textContent = ramen.name;
+        document.querySelector('h3.restaurant').textContent = ramen.restaurant;
         document.getElementById("rating-display").textContent = ramen.rating;
-        document.getElementById("comment-display").textContent = ramen.comment;        
-    })
+        document.getElementById("comment-display").textContent = ramen.comment;
+        })     
 
-    editForm.addEventListener("submit",(e)=>{
-        e.preventDefault();
-        ramen.rating = editForm.rating.value;
-            ramen.comment = editForm["new-comment"].value;
-        return fetch(`http://localhost:3000/ramens/${ramen.id}`,{
-            method: 'PATCH',
-            headers: {
-                "Content-Type": 'application/json',
-                'Accept': 'application/json',
-                    },
-            body: JSON.stringify({rating:ramen.rating, comment:ramen.comment}),
-        })
-        .then(resp => resp.json())
-        .then(()=>{
-            document.getElementById("rating-display").textContent = ramen.rating;
-            document.getElementById("comment-display").textContent = ramen.comment;  
-            editForm.reset(); })
-        
-    
-    
-      
-    })
-    
-
-        
-}
-
-
-
-form.addEventListener("submit", (e)=>{
-    e.preventDefault();
-    console.log('clicked')
-    const ramenObject=
-    {
-        "name": form.name.value,
-        "restaurant": form.restaurant.value,
-        "image": form.image.value,
-        "rating": form.rating.value,
-        "comment": form['new-comment'].value 
     }
-    console.log(ramenObject);
-    renderRamen(ramenObject);
-    return fetch("http://localhost:3000/ramens",{
-    method: 'POST',
-    headers: {
-        "Content-Type": 'application/json'
-    },
-    body: JSON.stringify(ramenObject)
+
+    form.addEventListener("submit",(e)=>{
+        e.preventDefault();
+       const newRamen={
+            "name": form.querySelector("#new-name").value,
+            "restaurant": form.querySelector("#new-restaurant").value,
+            "image": form.querySelector("#new-image").value,
+            "rating": form.querySelector("#new-rating").value,
+            "comment": form.querySelector("#new-comment").value,
+        }
+
+
+
+        
+       return renderRamen(newRamen)
     })
-    .then((resp) => resp.json())
-    .then(data => console.log(data))
-    .then(()=>form.reset())
-    
-
-})
 
 
 
-displayHeader();
+
+  
+
+   displayHeader()
